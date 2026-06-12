@@ -112,13 +112,13 @@ Preventable vs non-preventable rejection classification, breakdown by payer, and
 ![Executive Overview](dashboard-overview.png)
 
 ### Rejection Analysis
-![Rejection Analysis](screenshots/rejection-analysis.png)
+![Rejection Analysis](rejection-analysis.png)
 
 ### Operational Bottlenecks
-![Operational Bottlenecks](screenshots/operational-bottlenecks.png)
+![Operational Bottlenecks](operational-bottlenecks.png)
 
 ### Root Cause Analysis
-![Root Cause Analysis](screenshots/root-cause-analysis.png)
+![Root Cause Analysis](root-cause-analysis.png)
 
 ---
 
