@@ -109,7 +109,7 @@ Preventable vs non-preventable rejection classification, breakdown by payer, and
 ## Screenshots
 
 ### Executive Overview
-![Executive Overview](screenshots/dashboard-overview.png)
+![Executive Overview](dashboard-overview.png)
 
 ### Rejection Analysis
 ![Rejection Analysis](screenshots/rejection-analysis.png)
