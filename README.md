@@ -151,7 +151,8 @@ Preventable vs non-preventable rejection classification, breakdown by payer, and
 
 **Vigneshwari**
 MSc Data Analytics for Business — KEDGE Business School, France
-[LinkedIn](#) · [Portfolio](#)
+[LinkedIn](https://www.linkedin.com/in/vigna24/)
+[Portfolio](https://vigneshwari2408.github.io/vigneshwari-portfolio/)
 
 ---
 
