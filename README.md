@@ -30,7 +30,7 @@ This dashboard answers six questions that operations leaders actually ask:
 
 | Attribute | Detail |
 |-----------|--------|
-| **Source** | Kaggle — Enhanced Health Insurance Claims Dataset |
+| **Source** | [Healthcare Claims Dataset by lakshmijetty](https://www.kaggle.com/datasets/lakshmijetty/healthcare-claims-dataset) |
 | **Size** | 1,000 claims records |
 | **Time Period** | May 2024 — September 2024 |
 | **Format** | CSV |
@@ -150,9 +150,10 @@ Preventable vs non-preventable rejection classification, breakdown by payer, and
 ## Author
 
 **Vigneshwari**
+
 MSc Data Analytics for Business — KEDGE Business School, France
-[LinkedIn](https://www.linkedin.com/in/vigna24/)
-[Portfolio](https://vigneshwari2408.github.io/vigneshwari-portfolio/)
+
+[LinkedIn](https://www.linkedin.com/in/vigna24/) | [Portfolio](https://vigneshwari2408.github.io/vigneshwari-portfolio/)
 
 ---
 
