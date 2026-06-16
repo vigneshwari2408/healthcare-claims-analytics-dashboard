@@ -1,15 +1,12 @@
 -- ============================================================
 -- FILE: exploratory_analysis.sql
 -- PROJECT: Healthcare Claims Analytics Dashboard
--- PURPOSE: Explore the cleaned data to find patterns and insights
---          that will appear in the dashboard and README
--- HOW TO USE: Run each query one at a time by highlighting it
---             and pressing F5
+-- PURPOSE: Identify denial patterns, financial impact, and
+--          operational bottlenecks across 1,000 claims
 -- ============================================================
 
 
--- QUERY 1: How many claims are Paid, Denied, and Under Review?
--- This gives us the big picture breakdown of claim outcomes
+-- QUERY 1: Claim status distribution
 -- ============================================================
 SELECT
     claim_status,
@@ -19,9 +16,8 @@ GROUP BY claim_status
 ORDER BY total_claims DESC;
 
 
--- QUERY 2: What are the most common reasons for denial?
--- We filter to only Denied claims and count each reason
--- The top reason tells us where to focus process improvements
+-- QUERY 2: Top denial reasons ranked by volume
+-- Ordered by frequency to prioritize process improvement efforts
 -- ============================================================
 SELECT
     reason_code,
@@ -32,9 +28,9 @@ GROUP BY reason_code
 ORDER BY total DESC;
 
 
--- QUERY 3: Which insurance type has the highest denial rate?
--- denial_rate_pct = (denied claims / total claims) x 100
--- Helps identify which payers are causing the most problems
+-- QUERY 3: Denial rate by payer
+-- Distinguishes between raw denial count and denial rate
+-- to avoid conflating volume with performance
 -- ============================================================
 SELECT
     insurance_type,
@@ -46,10 +42,8 @@ GROUP BY insurance_type
 ORDER BY denial_rate_pct DESC;
 
 
--- QUERY 4: How many denials were preventable vs non-preventable?
--- Preventable = caused by admin errors staff can fix
--- Non-Preventable = clinical reasons outside operations control
--- This is the most important finding for recommendations
+-- QUERY 4: Preventable vs non-preventable denial split
+-- Window function used to calculate percentage within denied claims only
 -- ============================================================
 SELECT
     preventable_flag,
@@ -61,8 +55,7 @@ GROUP BY preventable_flag
 ORDER BY total DESC;
 
 
--- QUERY 5: How does the denial rate change month by month?
--- Shows whether denials are improving or getting worse over time
+-- QUERY 5: Monthly denial trend
 -- ============================================================
 SELECT
     month_label,
@@ -74,11 +67,7 @@ GROUP BY month_label
 ORDER BY month_label;
 
 
--- QUERY 6: What is the financial summary?
--- total_billed  = what providers charged
--- total_allowed = what insurers agreed to pay
--- total_paid    = what was actually paid
--- total_denied  = money lost to denials
+-- QUERY 6: Financial summary
 -- ============================================================
 SELECT
     ROUND(SUM(billed_amount), 2)  AS total_billed,
