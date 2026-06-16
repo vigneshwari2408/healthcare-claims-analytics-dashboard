@@ -1,16 +1,12 @@
 -- ============================================================
 -- FILE: data_cleaning.sql
 -- PROJECT: Healthcare Claims Analytics Dashboard
--- PURPOSE: Take the raw imported data, rename columns to remove
---          spaces, check data quality, and create a final clean
---          table with extra columns for analysis
+-- PURPOSE: Rename columns, validate data quality, and build
+--          the final analysis table with engineered features
 -- ============================================================
 
 
--- STEP 1: Rename columns
--- The original CSV has column names with spaces like "Claim ID"
--- SQL works much better with underscores like claim_id
--- So we create a new table called claims_clean with clean names
+-- STEP 1: Rename columns to remove spaces for SQL compatibility
 -- ============================================================
 CREATE TABLE claims_clean AS
 SELECT
@@ -32,16 +28,13 @@ SELECT
 FROM claims_raw;
 
 
--- STEP 2: Preview the renamed table
--- Just a sanity check to make sure the rename worked correctly
+-- STEP 2: Verify rename
 -- ============================================================
 SELECT * FROM claims_clean LIMIT 5;
 
 
 -- STEP 3: Check for duplicate claim IDs
--- Every claim should have a unique ID
--- If any claim_id appears more than once, something is wrong
--- A result of 0 rows means no duplicates — which is what we want
+-- Each claim should be unique — duplicates would skew counts
 -- ============================================================
 SELECT claim_id, COUNT(*) AS occurrences
 FROM claims_clean
@@ -49,9 +42,7 @@ GROUP BY claim_id
 HAVING COUNT(*) > 1;
 
 
--- STEP 4: Check for missing values
--- We check the most important columns for NULL (empty) values
--- A result of 0 across all columns means the data is complete
+-- STEP 4: Check for missing values in critical columns
 -- ============================================================
 SELECT
     SUM(CASE WHEN claim_id       IS NULL THEN 1 ELSE 0 END) AS null_claim_id,
@@ -62,14 +53,14 @@ SELECT
 FROM claims_clean;
 
 
--- STEP 5: Create the final analysis table
--- This is the main step. We take claims_clean and add new columns
--- that we need for the dashboard — things like denied_amount,
--- month/quarter labels, and flags for rejected/approved claims
+-- STEP 5: Build final analysis table with engineered features
+-- Date conversion: raw format is M/D/YYYY — converting to YYYY-MM-DD
+-- for SQLite strftime compatibility
+-- Denied amount and payment rate added for financial impact analysis
+-- Preventable flag classifies denials by operational root cause
 -- ============================================================
 CREATE TABLE claims_final AS
 SELECT
-    -- Original columns carried over as-is
     claim_id,
     provider_id,
     patient_id,
@@ -82,46 +73,25 @@ SELECT
     outcome,
     procedure_code,
     diagnosis_code,
-
-    -- Financial columns converted to numbers (REAL = decimal number)
     CAST(billed_amount  AS REAL) AS billed_amount,
     CAST(allowed_amount AS REAL) AS allowed_amount,
     CAST(paid_amount    AS REAL) AS paid_amount,
-
-    -- How much was NOT paid (billed minus what was actually paid)
     CAST(billed_amount AS REAL) - CAST(paid_amount AS REAL) AS denied_amount,
-
-    -- What percentage of the billed amount was paid
     ROUND(100.0 * CAST(paid_amount AS REAL) / CAST(billed_amount AS REAL), 2) AS payment_rate_pct,
 
-    -- Date columns broken down for charts in Power BI
-    -- month_label gives us "2024-01" format for monthly trend charts
-    strftime('%Y-%m', date_of_service) AS month_label,
-    CAST(strftime('%Y', date_of_service) AS INTEGER) AS claim_year,
-    CAST(strftime('%m', date_of_service) AS INTEGER) AS claim_month,
+    -- Convert M/D/YYYY to YYYY-MM-DD for strftime compatibility
+    substr(date_of_service, -4) || '-' ||
+    printf('%02d', CAST(substr(date_of_service, 1, instr(date_of_service, '/') - 1) AS INTEGER)) || '-' ||
+    printf('%02d', CAST(substr(date_of_service, instr(date_of_service, '/') + 1,
+        instr(substr(date_of_service, instr(date_of_service, '/') + 1), '/') - 1) AS INTEGER))
+    AS service_date,
 
-    -- Which quarter the claim belongs to (Q1, Q2, Q3, Q4)
-    CASE
-        WHEN CAST(strftime('%m', date_of_service) AS INTEGER) <= 3 THEN 'Q1'
-        WHEN CAST(strftime('%m', date_of_service) AS INTEGER) <= 6 THEN 'Q2'
-        WHEN CAST(strftime('%m', date_of_service) AS INTEGER) <= 9 THEN 'Q3'
-        ELSE 'Q4'
-    END AS claim_quarter,
-
-    -- Flag: is this claim denied? (1 = yes, 0 = no)
-    -- Used to count rejections easily in analysis
     CASE WHEN claim_status = 'Denied' THEN 1 ELSE 0 END AS is_rejected,
-
-    -- Flag: is this claim paid/approved? (1 = yes, 0 = no)
     CASE WHEN claim_status = 'Paid'   THEN 1 ELSE 0 END AS is_approved,
-
-    -- Flag: does this claim need follow-up? (1 = yes, 0 = no)
     CASE WHEN follow_up_required = 'Yes' THEN 1 ELSE 0 END AS follow_up_flag,
 
-    -- Was the rejection caused by something preventable?
-    -- Preventable = admin/process errors that staff can fix
-    -- Non-Preventable = clinical reasons outside operations control
-    -- N/A = claim was not denied so this does not apply
+    -- Preventable: admin/process errors correctable by operations
+    -- Non-Preventable: clinical or policy reasons outside ops control
     CASE
         WHEN claim_status != 'Denied'                      THEN 'N/A'
         WHEN reason_code = 'Authorization not obtained'    THEN 'Preventable'
@@ -135,8 +105,6 @@ SELECT
         ELSE 'Non-Preventable'
     END AS preventable_flag,
 
-    -- Claim size category based on billed amount
-    -- Used to see if larger claims get rejected more often
     CASE
         WHEN CAST(billed_amount AS REAL) < 500    THEN 'Low (under $500)'
         WHEN CAST(billed_amount AS REAL) <= 2000  THEN 'Medium ($500-$2K)'
@@ -147,9 +115,26 @@ SELECT
 FROM claims_clean;
 
 
--- STEP 6: Verify the final table
--- Quick check to confirm row count and flag totals look right
--- Expected: 1000 total, 328 denied, 334 paid
+-- STEP 6: Add date dimension columns after service_date conversion
+-- ============================================================
+ALTER TABLE claims_final ADD COLUMN month_label TEXT;
+ALTER TABLE claims_final ADD COLUMN claim_month INTEGER;
+ALTER TABLE claims_final ADD COLUMN claim_year INTEGER;
+ALTER TABLE claims_final ADD COLUMN claim_quarter TEXT;
+
+UPDATE claims_final SET
+    month_label   = strftime('%Y-%m', service_date),
+    claim_month   = CAST(strftime('%m', service_date) AS INTEGER),
+    claim_year    = CAST(strftime('%Y', service_date) AS INTEGER),
+    claim_quarter = CASE
+        WHEN CAST(strftime('%m', service_date) AS INTEGER) <= 3 THEN 'Q1'
+        WHEN CAST(strftime('%m', service_date) AS INTEGER) <= 6 THEN 'Q2'
+        WHEN CAST(strftime('%m', service_date) AS INTEGER) <= 9 THEN 'Q3'
+        ELSE 'Q4'
+    END;
+
+
+-- STEP 7: Validate final output
 -- ============================================================
 SELECT
     COUNT(*)         AS total_rows,
