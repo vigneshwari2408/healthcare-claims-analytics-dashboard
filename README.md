@@ -1,5 +1,5 @@
 # Healthcare Claims Analytics Dashboard
-> *Turning claims data into operational clarity — from rejection root causes to SLA performance.*
+> *Turning claims data into operational clarity — from denial root causes to approval rate trends and processing efficiency.*
 
 ---
 
