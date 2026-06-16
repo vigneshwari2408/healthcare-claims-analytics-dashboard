@@ -62,6 +62,16 @@ This dashboard answers six questions that operations leaders actually ask:
 
 ---
 
+## How to Reproduce
+
+1. Download the dataset from [Healthcare Claims Dataset — Kaggle](https://www.kaggle.com/datasets/lakshmijetty/healthcare-claims-dataset)
+2. Open **DB Browser for SQLite** → import the CSV as `claims_raw`
+3. Run `sql/data_cleaning.sql` to clean and engineer the final table
+4. Run `sql/exploratory_analysis.sql` to explore findings
+5. Open `dashboard/Healthcare_Claims_Dashboard.pbix` in **Power BI Desktop**
+   
+---
+
 ## Project Structure
 
 ```
