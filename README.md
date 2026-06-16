@@ -7,7 +7,7 @@
 
 Healthcare organizations lose significant time and revenue when claims are rejected, delayed, or incorrectly processed. For operations teams, the challenge is rarely a lack of data — it's a lack of *visibility*. Rejection trends go undetected, processing bottlenecks persist across quarters, and root causes remain buried in raw exports.
 
-This project builds an end-to-end analytics solution that transforms raw claims data into actionable intelligence, enabling operations teams to reduce rejection rates, identify systemic bottlenecks, and prioritize process improvements with evidence.
+This project builds an end-to-end analytics solution that transforms raw claims data into actionable intelligence, enabling operations teams to reduce rejection rates, identify systemic bottlenecks, and prioritize process improvements with evidence. This project uses a publicly available healthcare insurance dataset (Kaggle) to simulate a real-world claims operations analysis scenario.
 
 ---
 
