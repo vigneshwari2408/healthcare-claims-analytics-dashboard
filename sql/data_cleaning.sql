@@ -77,7 +77,7 @@ SELECT
     CAST(allowed_amount AS REAL) AS allowed_amount,
     CAST(paid_amount    AS REAL) AS paid_amount,
     CAST(billed_amount AS REAL) - CAST(paid_amount AS REAL) AS denied_amount,
-    ROUND(100.0 * CAST(paid_amount AS REAL) / CAST(billed_amount AS REAL), 2) AS payment_rate_pct,
+    ROUND(100.0 * CAST(paid_amount AS REAL) / NULLIF(CAST(billed_amount AS REAL), 0), 2) AS payment_rate_pct,
 
     -- Convert M/D/YYYY to YYYY-MM-DD for strftime compatibility
     substr(date_of_service, -4) || '-' ||
