@@ -67,10 +67,9 @@ This dashboard answers six questions that operations leaders actually ask:
 ```
 healthcare-claims-analytics-dashboard/
 ├── data/
-│   ├── raw/                        # Original dataset (unmodified)
-│   └── cleaned/                    # Post-cleaning output
+│   └── README.md                   # Dataset source and reproduction steps
 ├── sql/
-│   ├── data_cleaning.sql           # Null handling, standardization
+│   ├── data_cleaning.sql           # Null handling, standardization, feature engineering
 │   └── exploratory_analysis.sql    # EDA queries and KPI analysis
 ├── dashboard/
 │   └── Healthcare_Claims_Dashboard.pbix
@@ -80,9 +79,7 @@ healthcare-claims-analytics-dashboard/
 │   ├── operational-bottlenecks.png
 │   └── root-cause-analysis.png
 ├── documentation/
-│   ├── business_problem.md
-│   ├── data_dictionary.md
-│   └── project_methodology.md
+│   └── data_dictionary.md          # Column definitions and feature descriptions
 └── README.md
 ```
 
